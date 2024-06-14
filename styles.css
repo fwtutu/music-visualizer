@@ -47,9 +47,14 @@ body {
 
 .customization {
     text-align: left;
-    margin-bottom: 20px;
 }
 
 .option {
     margin-bottom: 10px;
+}
+
+#codeEditor {
+    width: 100%;
+    height: 200px;
+    font-family: monospace;
 }

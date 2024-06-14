@@ -4,10 +4,35 @@ const progressBar = document.getElementById('progressBar');
 const fileInput = document.getElementById('fileInput');
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
+
+// 自訂波型樣式選項
 const waveColorInput = document.getElementById('waveColor');
 const waveTypeSelect = document.getElementById('waveType');
 const waveWidthInput = document.getElementById('waveWidth');
+const waveOpacityInput = document.getElementById('waveOpacity');
+const waveHeightInput = document.getElementById('waveHeight');
+const waveSmoothingInput = document.getElementById('waveSmoothing');
+const waveGradientStartInput = document.getElementById('waveGradientStart');
+const waveGradientEndInput = document.getElementById('waveGradientEnd');
+const waveAnimationSelect = document.getElementById('waveAnimation');
+const savePresetBtn = document.getElementById('savePreset');
+const presetSelect = document.getElementById('presetSelect');
+const loadPresetBtn = document.getElementById('loadPreset');
+const codeEditor = document.getElementById('codeEditor');
+const visualizationModeSelect = document.getElementById('visualizationMode');
 
+// 初始化波型樣式
+let waveColor = waveColorInput.value;
+let waveType = waveTypeSelect.value;
+let waveWidth = waveWidthInput.value;
+let waveOpacity = waveOpacityInput.value;
+let waveHeight = waveHeightInput.value;
+let waveSmoothing = waveSmoothingInput.checked;
+let waveGradientStart = waveGradientStartInput.value;
+let waveGradientEnd = waveGradientEndInput.value;
+let waveAnimation = waveAnimationSelect.value;
+let presets = {};
+let visualizationMode = visualizationModeSelect.value;
 
 // 處理檔案上傳
 fileInput.addEventListener('change', function() {
@@ -22,8 +47,7 @@ playBtn.addEventListener('click', function() {
         audioElement.play();
         playBtn.textContent = '暫停';
     } else {
-        audioElement.pause();
-        playBtn.textContent = '播放';
+        audioElement.pause();playBtn.textContent = '播放';
     }
 });
 
@@ -38,11 +62,6 @@ progressBar.addEventListener('input', function() {
     const seekTime = (audioElement.duration * this.value) / 100;
     audioElement.currentTime = seekTime;
 });
-
-// 初始化波型樣式
-let waveColor = waveColorInput.value;
-let waveType = waveTypeSelect.value;
-let waveWidth = waveWidthInput.value;
 
 // 繪製波型
 function drawWave() {
@@ -66,8 +85,17 @@ function drawWave() {
         const barWidth = canvas.width / bufferLength * waveWidth;
         let x = 0;
         for (let i = 0; i < bufferLength; i++) {
-            const barHeight = dataArray[i] / 255 * canvas.height;
-            ctx.fillStyle = waveColor;
+            const barHeight = (dataArray[i] / 255) * (waveHeight / canvas.height) * canvas.height;
+            let gradient;
+
+            if (waveGradientStart !== waveGradientEnd) {
+                gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+                gradient.addColorStop(0, waveGradientStart);
+                gradient.addColorStop(1, waveGradientEnd);
+            }
+
+            ctx.fillStyle = gradient || waveColor;
+            ctx.globalAlpha = waveOpacity;
 
             switch (waveType) {
                 case 'bar':
@@ -77,7 +105,7 @@ function drawWave() {
                     ctx.beginPath();
                     ctx.moveTo(x, canvas.height);
                     ctx.lineTo(x, canvas.height - barHeight);
-                    ctx.strokeStyle = waveColor; // 設置線條顏色
+                    ctx.strokeStyle = gradient || waveColor;
                     ctx.stroke();
                     break;
                 case 'circle':
@@ -87,26 +115,111 @@ function drawWave() {
                     break;
             }
 
+            if (waveSmoothing) {
+                // 應用平滑處理
+            }
+
             x += barWidth + 1;
+        }
+
+        // 應用動畫效果
+        switch (waveAnimation) {
+            case 'flash':
+                // 實現閃爍效果
+                break;
+            case 'shift':
+                // 實現平移效果
+                break;
         }
     }
 
     animate();
 }
 
-
 // 監聽自訂樣式變更
-waveColorInput.addEventListener('input', () => {
+waveColorInput.addEventListener('input', updateWaveStyle);
+waveTypeSelect.addEventListener('change', updateWaveStyle);
+waveWidthInput.addEventListener('input', updateWaveStyle);
+waveOpacityInput.addEventListener('input', updateWaveStyle);
+waveHeightInput.addEventListener('input', updateWaveStyle);
+waveSmoothingInput.addEventListener('change', updateWaveStyle);
+waveGradientStartInput.addEventListener('input', updateWaveStyle);
+waveGradientEndInput.addEventListener('input', updateWaveStyle);
+waveAnimationSelect.addEventListener('change', updateWaveStyle);
+
+// 更新波型樣式
+function updateWaveStyle() {
     waveColor = waveColorInput.value;
-});
-
-waveTypeSelect.addEventListener('change', () => {
     waveType = waveTypeSelect.value;
-});
-
-waveWidthInput.addEventListener('input', () => {
     waveWidth = waveWidthInput.value;
+    waveOpacity = waveOpacityInput.value;
+    waveHeight = waveHeightInput.value;
+    waveSmoothing = waveSmoothingInput.checked;
+    waveGradientStart = waveGradientStartInput.value;
+    waveGradientEnd = waveGradientEndInput.value;
+    waveAnimation = waveAnimationSelect.value;
+}
+
+// 保存預設樣式
+savePresetBtn.addEventListener('click', function() {
+    const presetName = prompt('請輸入預設樣式名稱:');
+    if (presetName) {
+        const preset = {
+            waveColor,
+            waveType,
+            waveWidth,
+            waveOpacity,
+            waveHeight,
+            waveSmoothing,
+            waveGradientStart,
+            waveGradientEnd,
+            waveAnimation
+        };
+        presets[presetName] = preset;
+        presetSelect.options.length = 0;
+        for (const name in presets) {
+            const option = document.createElement('option');
+            option.value = name;
+            option.textContent = name;
+            presetSelect.add(option);
+        }
+    }
 });
 
+// 載入預設樣式
+loadPresetBtn.addEventListener('click', function() {
+    const presetName = presetSelect.value;
+    if (presetName) {
+        const preset = presets[presetName];
+        waveColorInput.value = preset.waveColor;
+        waveTypeSelect.value = preset.waveType;
+        waveWidthInput.value = preset.waveWidth;
+        waveOpacityInput.value = preset.waveOpacity;
+        waveHeightInput.value = preset.waveHeight;
+        waveSmoothingInput.checked = preset.waveSmoothing;
+        waveGradientStartInput.value = preset.waveGradientStart;
+        waveGradientEndInput.value = preset.waveGradientEnd;
+        waveAnimationSelect.value = preset.waveAnimation;
+        updateWaveStyle();
+    }
+});
+
+// 即時編輯器
+codeEditor.value = drawWave.toString();
+const drawWaveFunction = new Function('audioElement', 'canvas', 'ctx', codeEditor.value);
+
+codeEditor.addEventListener('input', function() {
+    try {
+        drawWaveFunction(audioElement, canvas, ctx);
+    } catch (error) {
+        console.error('編輯器代碼錯誤:', error);
+    }
+});
+
+// 切換可視化模式
+visualizationModeSelect.addEventListener('change', function() {
+    visualizationMode = this.value;
+    // 實現不同的可視化模式
+});
 
 audioElement.addEventListener('play', drawWave);
