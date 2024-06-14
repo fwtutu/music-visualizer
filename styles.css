@@ -1,0 +1,55 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #f2f2f2;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.player {
+    margin-bottom: 20px;
+}
+
+.controls {
+    margin-top: 10px;
+}
+
+#playBtn {
+    padding: 10px 20px;
+    font-size: 16px;
+}
+
+#progressBar {
+    width: 100%;
+}
+
+.upload {
+    margin-bottom: 20px;
+}
+
+#fileInput {
+    display: none;
+}
+
+.visualization {
+    margin-bottom: 20px;
+}
+
+#canvas {
+    width: 100%;
+    height: 200px;
+    background-color: #333;
+}
+
+.customization {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.option {
+    margin-bottom: 10px;
+}

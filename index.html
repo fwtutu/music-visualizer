@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>音樂可視化</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>音樂可視化</h1>
+        <div class="player">
+            <audio id="audio" controls></audio>
+            <div class="controls">
+                <button id="playBtn">播放</button>
+                <input type="range" id="progressBar" value="0">
+            </div>
+        </div>
+        <div class="upload">
+            <input type="file" id="fileInput" accept="audio/*">
+            <label for="fileInput">選擇音樂檔案</label>
+        </div>
+        <div class="visualization">
+            <canvas id="canvas"></canvas>
+        </div>
+        <div class="customization">
+            <h2>自訂波型樣式</h2>
+            <div class="option">
+                <label for="waveColor">波型顏色:</label>
+                <input type="color" id="waveColor" value="#ff0000">
+            </div>
+            <div class="option">
+                <label for="waveType">波型類型:</label>
+                <select id="waveType">
+                    <option value="bar">Bar</option>
+                    <option value="line">Line</option>
+                    <option value="circle">Circle</option>
+                </select>
+            </div>
+            <div class="option">
+                <label for="waveWidth">波型寬度:</label>
+                <input type="range" id="waveWidth" min="1" max="20" value="5">
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
