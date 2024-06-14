@@ -1,86 +1,109 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8"> 
     <title>音樂可視化</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
-</head>
+</head> 
 <body>
     <div class="container">
         <h1>音樂可視化</h1>
         <div class="player">
             <audio id="audio" controls></audio>
             <div class="controls">
-                <button id="playBtn">播放</button>
+                <button id="playBtn"><i class="fas fa-play"></i></button>
                 <input type="range" id="progressBar" value="0">
             </div>
         </div>
         <div class="upload">
             <input type="file" id="fileInput" accept="audio/*">
-            <label for="fileInput">選擇音樂檔案</label>
+            <label for="fileInput" class="upload-label">
+                <i class="fas fa-upload"></i> 上傳音樂檔案
+            </label>
         </div>
         <div class="visualization">
             <canvas id="canvas"></canvas>
         </div>
         <div class="customization">
-            <h2>自訂波型樣式</h2>
-            <div class="option">
-                <label for="waveColor">波型顏色:</label>
-                <input type="color" id="waveColor" value="#ff0000">
+            <div class="customization-header">
+                <h2>自訂波型樣式</h2>
+                <button id="toggleCustomization"><i class="fas fa-chevron-down"></i></button>
             </div>
-            <div class="option">
-                <label for="waveType">波型類型:</label>
-                <select id="waveType">
-                    <option value="bar">Bar</option>
-                    <option value="line">Line</option>
-                    <option value="circle">Circle</option>
-                </select>
-            </div>
-            <div class="option">
-                <label for="waveWidth">波型寬度:</label>
-                <input type="range" id="waveWidth" min="1" max="20" value="5">
-            </div>
-            <div class="option">
-                <label for="waveOpacity">波型不透明度:</label>
-                <input type="range" id="waveOpacity" min="0" max="1" step="0.01" value="1">
-            </div>
-            <div class="option">
-                <label for="waveHeight">波型高度:</label>
-                <input type="range" id="waveHeight" min="50" max="500" value="200">
-            </div>
-            <div class="option">
-                <label for="waveSmoothing">波型平滑度:</label>
-                <input type="checkbox" id="waveSmoothing">
-            </div>
-            <div class="option">
-                <label for="waveGradient">波型漸變:</label>
-                <input type="color" id="waveGradientStart" value="#ff0000">
-                <input type="color" id="waveGradientEnd" value="#00ff00">
-            </div>
-            <div class="option">
-                <label for="waveAnimation">波型動畫效果:</label>
-                <select id="waveAnimation">
-                    <option value="none">無</option>
-                    <option value="flash">閃爍</option>
-                    <option value="shift">平移</option>
-                </select>
-            </div>
-            <div class="option">
-                <button id="savePreset">保存預設樣式</button>
-                <select id="presetSelect"></select>
-                <button id="loadPreset">載入預設樣式</button>
-            </div>
-            <div class="option">
-                <label for="codeEditor">即時編輯器:</label>
-                <textarea id="codeEditor"></textarea>
-            </div>
-            <div class="option">
-                <label for="visualizationMode">可視化模式:</label>
-                <select id="visualizationMode">
-                    <option value="waveform">波形</option>
-                    <option value="spectrum">頻譜</option>
-                    <option value="notation">音樂譜</option>
-                </select>
+            <div class="customization-options">
+                <div class="option">
+                    <label for="waveType">波型類型:</label>
+                    <select id="waveType">
+                        <option value="bar">Bar</option>
+                        <option value="line">Line</option>
+                        <option value="circle">Circle</option>
+                    </select>
+                </div>
+                <div class="option">
+                    <label for="waveColorType">波型顏色設定:</label>
+                    <select id="waveColorType">
+                        <option value="solid">固定顏色</option>
+                        <option value="gradient">漸變顏色</option>
+                    </select>
+                </div>
+                <div class="option" id="waveColorOption">
+                    <label for="waveColor">波型顏色:</label>
+                    <input type="color" id="waveColor" value="#ff0000">
+                </div>
+                <div class="option" id="waveGradientOption" style="display: none;">
+                    <label for="waveGradient">波型漸變:</label>
+                    <input type="color" id="waveGradientStart" value="#ff0000">
+                    <input type="color" id="waveGradientEnd" value="#00ff00">
+                </div>
+                <div class="advanced-options">
+                    <details>
+                        <summary>進階選項</summary>
+                        <div class="option">
+                            <label for="waveWidth">波型寬度:</label>
+                            <input type="range" id="waveWidth" min="1" max="20" value="5">
+                        </div>
+                        <div class="option">
+                            <label for="waveOpacity">波型不透明度:</label>
+                            <input type="range" id="waveOpacity" min="0" max="1" step="0.01" value="1">
+                        </div>
+                        <div class="option">
+                            <label for="waveHeight">波型高度:</label>
+                            <input type="range" id="waveHeight" min="50" max="500" value="200">
+                        </div>
+                        <div class="option">
+                            <label for="waveSmoothing">
+                                <input type="checkbox" id="waveSmoothing"> 波型平滑度
+                            </label>
+                        </div>
+                        <div class="option">
+                            <label for="waveGradient">波型漸變:</label>
+                            <input type="color" id="waveGradientStart" value="#ff0000">
+                            <input type="color" id="waveGradientEnd" value="#00ff00">
+                        </div>
+                        <div class="option">
+                            <label for="waveAnimation">波型動畫效果:</label>
+                            <select id="waveAnimation">
+                                <option value="none">無</option>
+                                <option value="flash">閃爍</option>
+                                <option value="shift">平移</option>
+                            </select>
+                        </div>
+                    </details>
+                </div>
+                <div class="option">
+                    <label for="presetSelect">預設樣式:</label>
+                    <select id="presetSelect"></select>
+                    <button id="savePreset"><i class="fas fa-save"></i></button>
+                    <button id="loadPreset"><i class="fas fa-folder-open"></i></button>
+                </div>
+                <div class="option">
+                    <label for="visualizationMode">可視化模式:</label>
+                    <select id="visualizationMode">
+                        <option value="waveform">波形</option>
+                        <option value="spectrum">頻譜</option>
+                        <option value="notation">音樂譜</option>
+                    </select>
+                </div>
             </div>
         </div>
     </div>
