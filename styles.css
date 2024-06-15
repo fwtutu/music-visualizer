@@ -160,8 +160,10 @@ details > summary {
 
 #waveColorOption,
 #waveGradientOption {
-    display: none;
+    display: flex;
 }
+
+
 
 /* 根據選擇顯示相應的顏色選項 */
 #waveColorType {
