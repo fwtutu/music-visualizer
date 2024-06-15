@@ -88,10 +88,11 @@ function updateWaveStyle() {
 function drawWaveform(dataArray) {
     const bufferLength = dataArray.length;
     const barWidth = canvas.width / bufferLength * waveWidth;
+    let gradient;
     let x = 0;
     for (let i = 0; i < bufferLength; i++) {
         const barHeight = (dataArray[i] / 255) * (waveHeight / canvas.height) * canvas.height;
-        let gradient;
+
 
          // 檢查是否應用漸變
         if (waveColorTypeSelect.value === 'gradient') {
