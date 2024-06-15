@@ -83,17 +83,6 @@ function updateWaveStyle() {
     waveAnimation = waveAnimationSelect.value;
 }
 
-// 更新波型颜色
-function updateWaveColor() {
-    if (waveColorSetting.value === 'gradient' && waveGradientStart !== waveGradientEnd) {
-        gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-        gradient.addColorStop(0, waveGradientStart);
-        gradient.addColorStop(1, waveGradientEnd);
-        ctx.fillStyle = gradient;
-    } else {
-        ctx.fillStyle = waveColor;
-    }
-}
 
 // 绘制波型
 function drawWaveform(dataArray) {
@@ -104,8 +93,8 @@ function drawWaveform(dataArray) {
         const barHeight = (dataArray[i] / 255) * (waveHeight / canvas.height) * canvas.height;
         let gradient;
 
-        // 檢查是否應用漸變
-        if (waveGradientStart !== waveGradientEnd && waveGradientStart !== '#000000' && waveGradientEnd !== '#000000') {
+         // 檢查是否應用漸變
+        if (waveColorTypeSelect.value === 'gradient') {
             gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
             gradient.addColorStop(0, waveGradientStart);
             gradient.addColorStop(1, waveGradientEnd);
