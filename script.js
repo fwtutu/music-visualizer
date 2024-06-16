@@ -28,15 +28,18 @@ const loadPresetBtn = document.getElementById('loadPreset');
 const visualizationModeSelect = document.getElementById('visualizationMode');
 
 // 初始化波型樣式
-let waveType = waveTypeSelect.value;
-let waveColor = waveColorInput.value;
-let waveWidth = waveWidthInput.value;
-let waveOpacity = waveOpacityInput.value;
-let waveHeight = waveHeightInput.value;
-let waveSmoothing = waveSmoothingInput.checked;
-let waveGradientStart = waveGradientStartInput.value;
-let waveGradientEnd = waveGradientEndInput.value;
-let waveAnimation = waveAnimationSelect.value;
+let waveSettings = {
+    waveType: waveTypeSelect.value,
+    waveColor: waveColorInput.value,
+    waveWidth: waveWidthInput.value,
+    waveOpacity: waveOpacityInput.value,
+    waveHeight: waveHeightInput.value,
+    waveSmoothing: waveSmoothingInput.checked,
+    waveGradientStart: waveGradientStartInput.value,
+    waveGradientEnd: waveGradientEndInput.value,
+    waveAnimation: waveAnimationSelect.value
+};
+
 let presets = {};
 let visualizationMode = visualizationModeSelect.value;
 
@@ -72,40 +75,38 @@ progressBar.addEventListener('input', function () {
 
 // 更新波型樣式
 function updateWaveStyle() {
-    waveType = waveTypeSelect.value;
-    waveColor = waveColorInput.value;
-    waveWidth = waveWidthInput.value;
-    waveOpacity = waveOpacityInput.value;
-    waveHeight = waveHeightInput.value;
-    waveSmoothing = waveSmoothingInput.checked;
-    waveGradientStart = waveGradientStartInput.value;
-    waveGradientEnd = waveGradientEndInput.value;
-    waveAnimation = waveAnimationSelect.value;
+    waveSettings = {
+        waveType: waveTypeSelect.value,
+        waveColor: waveColorInput.value,
+        waveWidth: waveWidthInput.value,
+        waveOpacity: waveOpacityInput.value,
+        waveHeight: waveHeightInput.value,
+        waveSmoothing: waveSmoothingInput.checked,
+        waveGradientStart: waveGradientStartInput.value,
+        waveGradientEnd: waveGradientEndInput.value,
+        waveAnimation: waveAnimationSelect.value
+    };
 }
-
 
 // 绘制波型
 function drawWaveform(dataArray) {
     const bufferLength = dataArray.length;
-    const barWidth = canvas.width / bufferLength * waveWidth;
-    let gradient;
+    const barWidth = (canvas.width / bufferLength) * waveSettings.waveWidth;
     let x = 0;
     for (let i = 0; i < bufferLength; i++) {
-        const barHeight = (dataArray[i] / 255) * (waveHeight / canvas.height) * canvas.height;
+        const barHeight = (dataArray[i] / 255) * (waveSettings.waveHeight / canvas.height) * canvas.height;
+        let gradient;
 
-
-         // 檢查是否應用漸變
         if (waveColorTypeSelect.value === 'gradient') {
             gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-            gradient.addColorStop(0, waveGradientStart);
-            gradient.addColorStop(1, waveGradientEnd);
+            gradient.addColorStop(0, waveSettings.waveGradientStart);
+            gradient.addColorStop(1, waveSettings.waveGradientEnd);
         }
 
-        // 如果應用漸變且漸變有效，使用漸變色，否則使用單一顏色
-        ctx.fillStyle = gradient || waveColor;
-        ctx.globalAlpha = waveOpacity;
+        ctx.fillStyle = gradient || waveSettings.waveColor;
+        ctx.globalAlpha = waveSettings.waveOpacity;
 
-        switch (waveType) {
+        switch (waveSettings.waveType) {
             case 'bar':
                 ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
                 break;
@@ -113,7 +114,7 @@ function drawWaveform(dataArray) {
                 ctx.beginPath();
                 ctx.moveTo(x, canvas.height);
                 ctx.lineTo(x, canvas.height - barHeight);
-                ctx.strokeStyle = gradient || waveColor;
+                ctx.strokeStyle = gradient || waveSettings.waveColor;
                 ctx.stroke();
                 break;
             case 'circle':
@@ -122,16 +123,15 @@ function drawWaveform(dataArray) {
                 ctx.fill();
                 break;
         }
-
         x += barWidth + 1;
     }
 }
 
 function drawSpectrum(dataArray, analyser) {
-    const barWidth = canvas.width / analyser.fftSize * 2;
+    const barWidth = (canvas.width / analyser.fftSize) * 2;
     let x = 0;
     for (let i = 0; i < analyser.fftSize / 2; i++) {
-        const barHeight = dataArray[i] / 255 * canvas.height;
+        const barHeight = (dataArray[i] / 255) * canvas.height;
         ctx.fillStyle = `rgb(${barHeight + 100}, 50, 50)`;
         ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
         x += barWidth;
@@ -139,7 +139,7 @@ function drawSpectrum(dataArray, analyser) {
 }
 
 function drawVisualization() {
-    const audioCtx = new AudioContext();
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const analyser = audioCtx.createAnalyser();
     const source = audioCtx.createMediaElementSource(audioElement);
     source.connect(analyser);
@@ -167,50 +167,31 @@ function drawVisualization() {
 }
 
 // 监听自定义样式变化
-waveTypeSelect.addEventListener('change', updateWaveStyle);
-waveColorInput.addEventListener('input', updateWaveStyle);
-waveWidthInput.addEventListener('input', updateWaveStyle);
-waveOpacityInput.addEventListener('input', updateWaveStyle);
-waveHeightInput.addEventListener('input', updateWaveStyle);
-waveSmoothingInput.addEventListener('change', updateWaveStyle);
-waveGradientStartInput.addEventListener('input', updateWaveStyle);
-waveGradientEndInput.addEventListener('input', updateWaveStyle);
-waveAnimationSelect.addEventListener('change', updateWaveStyle);
+[
+    waveTypeSelect, waveColorInput, waveWidthInput, waveOpacityInput, 
+    waveHeightInput, waveSmoothingInput, waveGradientStartInput, 
+    waveGradientEndInput, waveAnimationSelect
+].forEach(element => element.addEventListener('input', updateWaveStyle));
 
 // 监听颜色类型变化
 waveColorTypeSelect.addEventListener('change', function() {
-    if (waveColorTypeSelect.value === 'solid') {
-        waveColorOption.style.display = 'block';
-        waveGradientOption.style.display = 'none';
-    } else if (waveColorTypeSelect.value === 'gradient') {
-        waveColorOption.style.display = 'none';
-        waveGradientOption.style.display = 'block';
-    }
+    const display = waveColorTypeSelect.value === 'gradient' ? 'none' : 'block';
+    waveColorOption.style.display = display;
+    waveGradientOption.style.display = display === 'none' ? 'block' : 'none';
 });
 
 // 保存预设样式
 savePresetBtn.addEventListener('click', function () {
     const presetName = prompt('請輸入預設樣式名稱:');
     if (presetName) {
-        const preset = {
-            waveType,
-            waveColor,
-            waveWidth,
-            waveOpacity,
-            waveHeight,
-            waveSmoothing,
-            waveGradientStart,
-            waveGradientEnd,
-            waveAnimation
-        };
-        presets[presetName] = preset;
-        presetSelect.options.length = 0;
-        for (const name in presets) {
+        presets[presetName] = { ...waveSettings };
+        presetSelect.innerHTML = '';
+        Object.keys(presets).forEach(name => {
             const option = document.createElement('option');
             option.value = name;
             option.textContent = name;
             presetSelect.add(option);
-        }
+        });
     }
 });
 
@@ -219,6 +200,11 @@ loadPresetBtn.addEventListener('click', function () {
     const presetName = presetSelect.value;
     if (presetName) {
         const preset = presets[presetName];
+        Object.keys(preset).forEach(key => {
+            if (key in waveSettings) {
+                waveSettings[key] = preset[key];
+            }
+        });
         waveTypeSelect.value = preset.waveType;
         waveColorInput.value = preset.waveColor;
         waveWidthInput.value = preset.waveWidth;
